@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:todoey_flutter/models/task.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:todoey_flutter/models/task_data.dart';
+import '../moor_database.dart';
 
 class AddTaskScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String newTaskTitle;
-
     return Container(
       color: Color(0xff757575),
       child: Container(
+        height: 200,
+        width: double.infinity,
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.0),
+            topLeft: Radius.circular(20.0),
             topRight: Radius.circular(20.0),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
           children: <Widget>[
             Text(
               'Add Task',
@@ -31,12 +31,10 @@ class AddTaskScreen extends StatelessWidget {
               ),
             ),
             TextField(
-              autofocus: true,
-              textAlign: TextAlign.center,
-              onChanged: (newText) {
-                newTaskTitle = newText;
-              },
-            ),
+                autofocus: true,
+                onChanged: (newText) {
+                  newTaskTitle = newText;
+                }),
             FlatButton(
               child: Text(
                 'Add',
@@ -46,7 +44,11 @@ class AddTaskScreen extends StatelessWidget {
               ),
               color: Colors.lightBlueAccent,
               onPressed: () {
-                Provider.of<TaskData>(context).addTask(newTaskTitle);
+                final database = Provider.of<TaskDao>(context);
+                final task = TasksCompanion(
+                  name: Value(newTaskTitle),
+                );
+                database.insertTask(task);
                 Navigator.pop(context);
               },
             ),
